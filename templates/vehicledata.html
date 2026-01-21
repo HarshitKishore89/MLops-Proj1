@@ -1,62 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Vehicle Insurance Prediction</title>
-    <!-- Corrected the CSS path -->
+
+    <!-- SEO -->
+    <meta name="description" content="Predict vehicle insurance likelihood using machine learning">
+
+    <!-- Styles -->
     <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        :root {
+            --primary: #1f3a5f;
+            --secondary: #3b82f6;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--primary);
+            padding: 1.2rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        header>h1{
+            color: white;
+        }
+        main {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem 1.2rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.6rem 0.7rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+
+        .full {
+            grid-column: span 2;
+        }
+
+        .actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #15803d;
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-left: 5px solid var(--secondary);
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        @media (max-width: 700px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+            .full {
+                grid-column: span 1;
+            }
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Loader Spinner Styles */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .loader-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .spinner-container {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Vehicle Insurance Prediction</h1>
+
+<!-- Loader Overlay -->
+<div class="loader-overlay" id="loaderOverlay">
+    <div class="spinner-container">
+        <div class="spinner"></div>
+        <div class="loader-text">Processing your prediction...</div>
+    </div>
+</div>
+
+<header>
+    <h1>🚗 Vehicle Insurance Prediction</h1>
+</header>
+
+<main>
+    <div class="card">
+        <h2>Customer Information</h2>
 
         <form method="post" action="/">
-            <label for="Gender">Gender (1: Male, 0: Female):</label>
-            <input type="number" id="Gender" name="Gender" min="0" max="1" required>
-
-            <label for="Age">Age:</label>
-            <input type="number" id="Age" name="Age" required>
-
-            <label for="Driving_License">Driving License (0: No, 1: Yes):</label>
-            <input type="number" id="Driving_License" name="Driving_License" min="0" max="1" required>
-
-            <label for="Region_Code">Region Code:</label>
-            <input type="number" step="0.01" id="Region_Code" name="Region_Code" required>
-
-            <label for="Previously_Insured">Previously Insured (0: No, 1: Yes):</label>
-            <input type="number" id="Previously_Insured" name="Previously_Insured" min="0" max="1" required>
-
-            <label for="Annual_Premium">Annual Premium:</label>
-            <input type="number" step="0.01" id="Annual_Premium" name="Annual_Premium" required>
-
-            <label for="Policy_Sales_Channel">Policy Sales Channel:</label>
-            <input type="number" step="0.01" id="Policy_Sales_Channel" name="Policy_Sales_Channel" required>
-
-            <label for="Vintage">Vintage:</label>
-            <input type="number" id="Vintage" name="Vintage" required>
-
-            <label for="Vehicle_Age_lt_1_Year">Vehicle Age < 1 Year (0: No, 1: Yes):</label>
-            <input type="number" id="Vehicle_Age_lt_1_Year" name="Vehicle_Age_lt_1_Year" min="0" max="1" required>
-
-            <label for="Vehicle_Age_gt_2_Years">Vehicle Age > 2 Years (0: No, 1: Yes):</label>
-            <input type="number" id="Vehicle_Age_gt_2_Years" name="Vehicle_Age_gt_2_Years" min="0" max="1" required>
-
-            <label for="Vehicle_Damage_Yes">Vehicle Damage (0: No, 1: Yes):</label>
-            <input type="number" id="Vehicle_Damage_Yes" name="Vehicle_Damage_Yes" min="0" max="1" required>
-
-            <button type="submit">Predict</button>
-        </form>
-
-        <form method="get" action="/train">
-            <button type="submit" class="train-button">Train Model</button>
-        </form>
-
-        {% if context %}
-            <div class="result">
-                <h2>Result: {{ context }}</h2>
+            <div>
+                <label>Gender</label>
+                <select name="Gender" required>
+                    <option value="">Select</option>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
             </div>
-        {% endif %}
+
+            <div>
+                <label>Age</label>
+                <input type="number" name="Age" min="18" required />
+            </div>
+
+            <div>
+                <label>Driving License</label>
+                <select name="Driving_License" required>
+                    <option value="">Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Region Code</label>
+                <input type="number" step="0.01" name="Region_Code" required />
+            </div>
+
+            <div>
+                <label>Previously Insured</label>
+                <select name="Previously_Insured" required>
+                    <option value="">Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Annual Premium</label>
+                <input type="number" step="0.01" name="Annual_Premium" required />
+            </div>
+
+            <div>
+                <label>Policy Sales Channel</label>
+                <input type="number" step="0.01" name="Policy_Sales_Channel" required />
+            </div>
+
+            <div>
+                <label>Vintage (days)</label>
+                <input type="number" name="Vintage" required />
+            </div>
+
+            <div>
+                <label>Vehicle Age &lt; 1 Year</label>
+                <select name="Vehicle_Age_lt_1_Year" required>
+                    <option value="">Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Vehicle Age &gt; 2 Years</label>
+                <select name="Vehicle_Age_gt_2_Years" required>
+                    <option value="">Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="full">
+                <label>Vehicle Damage</label>
+                <select name="Vehicle_Damage_Yes" required>
+                    <option value="">Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <div class="actions full">
+                <button class="btn-primary" type="submit">Predict</button>
+                <button class="btn-secondary" type="submit" formaction="/train" formmethod="get">
+                    Train Model
+                </button>
+            </div>
+        </form>
+
+
     </div>
+</main>
+
+<footer>
+    © 2026 Vehicle Insurance ML Platform · Production Ready
+</footer>
+
+<script>
+    // Show loader when form is submitted for prediction
+    const form = document.querySelector('form');
+    const loaderOverlay = document.getElementById('loaderOverlay');
+
+    form.addEventListener('submit', function(e) {
+        // Check if it's a prediction request (not training)
+        const submitButton = e.submitter;
+        const isTrainButton = submitButton && submitButton.formaction === '/train';
+        
+        if (!isTrainButton) {
+            // Show loader only for prediction
+            loaderOverlay.classList.add('show');
+        }
+    });
+</script>
+
 </body>
 </html>

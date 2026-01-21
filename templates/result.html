@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prediction Result</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Vehicle insurance prediction result">
+
+    <style>
+        :root {
+            --primary: #1f3a5f;
+            --secondary: #3b82f6;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --border: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0.5rem 0;
+            color: var(--text);
+        }
+
+        .status-box {
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .status-yes {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid var(--success);
+        }
+
+        .status-no {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border: 2px solid var(--danger);
+        }
+
+        .message {
+            font-size: 1rem;
+            color: #6b7280;
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button, a {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-retry {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-retry:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-train {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-train:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(22, 163, 74, 0.4);
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 600px) {
+            .result-card {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .icon {
+                font-size: 3rem;
+            }
+
+            .status-box {
+                padding: 1.5rem;
+                font-size: 1.1rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            button, a {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="result-card">
+            {% if context == "Response-Yes" %}
+            <div class="icon">✅</div>
+            <h1>Great News!</h1>
+            <div class="status-box status-yes">
+                {{ context }}
+            </div>
+            <p class="message">
+                The customer is <strong>likely to purchase vehicle insurance</strong>. This is a positive lead that should be prioritized.
+            </p>
+            {% else %}
+            <div class="icon">ℹ️</div>
+            <h1>Prediction Complete</h1>
+            <div class="status-box status-no">
+                {{ context }}
+            </div>
+            <p class="message">
+                The customer is <strong>unlikely to purchase vehicle insurance</strong> at this time. Consider personalized offers.
+            </p>
+            {% endif %}
+
+            <div class="actions">
+                <a href="/" class="btn-retry">🔄 Retry</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        © 2026 Vehicle Insurance ML Platform · Production Ready
+    </footer>
+
+</body>
+</html>

@@ -101,6 +101,8 @@ async def predictRouteClient(request: Request):
     """
     Endpoint to receive form data, process it, and make a prediction.
     """
+
+    print("Request received for prediction**********")
     try:
         form = DataForm(request)
         await form.get_vehicle_data()
@@ -131,9 +133,9 @@ async def predictRouteClient(request: Request):
         # Interpret the prediction result as 'Response-Yes' or 'Response-No'
         status = "Response-Yes" if value == 1 else "Response-No"
 
-        # Render the same HTML page with the prediction result
+        # Render the result page with the prediction result
         return templates.TemplateResponse(
-            "vehicledata.html",
+            "result.html",
             {"request": request, "context": status},
         )
         
